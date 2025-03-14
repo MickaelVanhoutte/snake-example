@@ -11,6 +11,7 @@
         tail: Position[]
     }
 
+    let paused = false;
     const grid: string[][] = [];
     let finished = false;
     let intervalId = 0;
@@ -59,70 +60,67 @@
 
     function startGameLoop(): number {
         return setInterval(() => {
-            console.log('tick', snake.direction);
+            if (!paused) {
 
-            updateTailPositions();
-            switch (snake.direction) {
-                case "N":
-                    if (snake.tail[0].y === -1) {
-                        alert('Game Over');
-                        finished = true;
-                    }
-                    break;
-                case "S":
-                    if (snake.tail[0].y === 20) {
-                        alert('Game Over');
-                        finished = true;
-                    }
-                    break;
+                updateTailPositions();
+                switch (snake.direction) {
+                    case "N":
+                        if (snake.tail[0].y === -1) {
+                            alert('Game Over');
+                            finished = true;
+                        }
+                        break;
+                    case "S":
+                        if (snake.tail[0].y === 20) {
+                            alert('Game Over');
+                            finished = true;
+                        }
+                        break;
 
-                case "E":
-                    if (snake.tail[0].x === 20) {
-                        alert('Game Over');
-                        finished = true;
-                    }
-                    break;
-                case "W":
-                    if (snake.tail[0].x === -1) {
-                        alert('Game Over');
-                        finished = true;
-                    }
-                    break;
-            }
-            if (snake.tail.slice(1, snake.tail?.length - 1).some(elem => elem.x === snake.tail[0].x && elem.y === snake.tail[0].y)) {
-                alert("bouffeur de queue !");
-                finished = true;
-            }
+                    case "E":
+                        if (snake.tail[0].x === 20) {
+                            alert('Game Over');
+                            finished = true;
+                        }
+                        break;
+                    case "W":
+                        if (snake.tail[0].x === -1) {
+                            alert('Game Over');
+                            finished = true;
+                        }
+                        break;
+                }
+                if (snake.tail.slice(1, snake.tail?.length - 1).some(elem => elem.x === snake.tail[0].x && elem.y === snake.tail[0].y)) {
+                    alert("bouffeur de queue !");
+                    finished = true;
+                }
 
-            if (apple?.x === snake.tail[0].x && apple?.y === snake.tail[0].y) {
-                growSnakeTail();
-                apple = undefined;
-                addApple();
+                if (apple?.x === snake.tail[0].x && apple?.y === snake.tail[0].y) {
+                    growSnakeTail();
+                    apple = undefined;
+                    addApple();
+                }
             }
-        }, 200);
+        }, 400);
     }
 
     function updateTailPositions() {
-
-        //---x
-        for (let i = snake.tail?.length -1; i > 0; i--) {
-
+        for (let i = snake.tail?.length - 1; i > 0; i--) {
             snake.tail[i] = {
                 x: snake.tail[i - 1].x,
                 y: snake.tail[i - 1].y
             }
         }
         snake.tail[0].x = snake.direction === 'E' ? snake.tail[0].x + 1 : snake.direction === 'W' ? snake.tail[0].x - 1 : snake.tail[0].x;
-        snake.tail[0].y = snake.direction === 'S' ?  snake.tail[0].y +1 : snake.direction === 'N' ?  snake.tail[0].y - 1 :  snake.tail[0].y;
-        console.log(snake.tail);
+        snake.tail[0].y = snake.direction === 'S' ? snake.tail[0].y + 1 : snake.direction === 'N' ? snake.tail[0].y - 1 : snake.tail[0].y;
     }
 
     function growSnakeTail() {
-       /*
-        const direct = N|S|E|W
-        en fonction des 2 derniers de la tail
-        deduire le x et y selon le dernier element de la tail et la direction
-       */
+        /*
+         const direct = N|S|E|W
+         en fonction des 2 derniers de la tail
+         deduire le x et y selon le dernier element de la tail et la direction
+        */
         snake.tail.push({
             x: 0,
             y: 0
@@ -137,6 +135,7 @@
     onMount(() => {
 
         window.addEventListener('keydown', (e) => {
+            console.log(e.key);
             switch (e.key) {
                 case 'ArrowUp':
                     snake.direction = 'N';
@@ -149,6 +148,12 @@
                     break;
                 case 'ArrowRight':
                     snake.direction = 'E';
+                    break;
+                case 'p':
+                    paused = !paused;
+                    break;
+                case 'g':
+                    growSnakeTail();
                     break;
             }
         });
